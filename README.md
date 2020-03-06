@@ -7,7 +7,8 @@ pynbsim can be used in any Python Jupyter notebook. Add a cell to your notebook 
 following code:
 
 ```python
+import sys
 %%capture --no-display
-!pip install dbbs-scaffold
+!{sys.executable} -m pip install pynb-sim
 import pynbsim; pynbsim.widget()
 ```

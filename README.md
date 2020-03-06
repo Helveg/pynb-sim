@@ -8,7 +8,6 @@ following code:
 
 ```python
 import sys
-%%capture --no-display
-!{sys.executable} -m pip install pynb-sim
+pip_output = !{sys.executable} -m pip install pynb-sim
 import pynbsim; pynbsim.widget()
 ```

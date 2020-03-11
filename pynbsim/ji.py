@@ -47,3 +47,6 @@ def widget():
     """))
     with open(os.path.join(os.path.dirname(__file__), "index.html")) as f:
         display(HTML(f.read()))
+
+def progress_text():
+    pass

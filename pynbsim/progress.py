@@ -1,4 +1,4 @@
-import types
+import types, os
 
 class ProgressReader:
     def listen(self):
@@ -16,6 +16,10 @@ class ProgressFileReader(ProgressReader):
         preamble = chr(240) + chr(80) + chr(85) + chr(248) + chr(228)
         bar = chr(191) * 3
         in_message = False
+        if not os.path.exists(self.file):
+            # Touch the file if it doesn't exist
+            with open(self.file, "a"):
+                pass
         with open(self.file, 'r') as f:
             f.seek(0, 2)
             while True:

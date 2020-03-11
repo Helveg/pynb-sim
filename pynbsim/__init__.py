@@ -1,6 +1,7 @@
-__version__ = "0.1.2"
-from .ji import widget
+__version__ = "0.1.3"
+from .ji import widget, progress_text
 from .progress import ProgressFileReader
+from IPython.core.display import display, HTML
 
 
 def simulate(command, progress_reader=None):
@@ -11,4 +12,4 @@ def simulate(command, progress_reader=None):
     if progress_reader:
         for progress_message in progress_reader.listen(process):
             clear_output()
-            display("Simulated", progress_message.progression, "out of", progress_message.duration, "milliseconds")
+            display(HTML("Simulated " + str(progress_message.progression) + " out of " + str(progress_message.duration) + " milliseconds"))

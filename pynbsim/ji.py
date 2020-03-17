@@ -46,9 +46,9 @@ def widget():
     with open(os.path.join(os.path.dirname(__file__), "index.html")) as f:
         display(HTML(f.read()))
 
-def progress_text(token):
+def progress_text(token, simulation):
     display(HTML(format("""
-        <div id="{{|token|}}">Simulation starting...</div>
+        <div id="{{|token|}}"></div>
         <script>
             {{|tag|}}
             $(".inj-{{|token|}}").remove();
@@ -58,6 +58,36 @@ def progress_text(token):
             console.log("Progress cell?", progressTextCodeCell);
             console.log("Progress label?", progressTextLabel);
             progressTextCodeCell.prepend({{|powered_by_header|}}.addClass('inj-{{|token|}}'));
+            (() => {
+                let label = progressTextLabel;
+                let icon = $("<i class='fa fa-spinner fa-spin'></i>");
+                icon.appendTo(label);
+                let text = $("<span style='margin-left: 8px'>Simulation starting...</span>");
+                text.appendTo(label);
+                let simulation_token = '{{|simulation|}}';
+                console.log("IFE", label, simulation_token);
+                listenToProgress(simulation_token, progress_event => {
+                    if(progress_event.status == 'started') {
+                        text.text("Simulation started...");
+                    } else if(progress_event.status == 'running') {
+                        let progress_message = progress_event.progress;
+                        text.text(
+                            "Simulated "
+                            + progress_message.progression.toString()
+                            + " out of "
+                            + progress_message.duration.toString()
+                            + " milliseconds"
+                        )
+                    } else if(progress_event.status == 'finished') {
+                        text.text("Simulation finished.");
+                        icon.removeClass('fa-spinner');
+                        icon.removeClass('fa-spin');
+                        icon.addClass('fa-check');
+                        icon.css('color', 'green');
+                    }
+                    console.log("progress listen", label, simulation_token, progress_event);
+                });
+            })()
         </script>
         <style>
             /* Keep the injected blocks alive as long as this output exists */
@@ -67,7 +97,8 @@ def progress_text(token):
         </style>""",
         token=token,
         token_var=token.replace("-", "_"),
-        tag=tag_code_cell(token, "progressTextCodeCell")
+        tag=tag_code_cell(token, "progressTextCodeCell"),
+        simulation=simulation
     )))
 
 def tag_code_cell(unique, var="codeCell"):
@@ -81,9 +112,9 @@ def tag_code_cell(unique, var="codeCell"):
 
 def init_page():
     display(HTML("""<script>
-        $.getScript("https://kit.fontawesome.com/aceb3af2d4.js", function(){
-
-        });
+        // Load FontAwesome kit.
+        $.getScript("https://kit.fontawesome.com/aceb3af2d4.js", function(){});
+        // Apply global styles.
         $(`<style>
             .powered-by-header {
                 width: 100%;
@@ -104,4 +135,24 @@ def init_page():
                 color: white;
                 font-style: normal;
             }
-        </style>`).appendTo( "head" );"""))
+        </style>`).appendTo( "head" );
+        // Create listener interface
+        var progressListeners = {};
+        function reportProgress(token, progress) {
+        console.log('received progress for:', token, progress);
+            if(!(token in progressListeners)) {
+                console.log('No listeners for', token);
+                return;
+            }
+            for(let listener of progressListeners[token]) {
+                listener(progress);
+            }
+        }
+        function listenToProgress(token, callback) {
+            if(!(token in progressListeners)) {
+                progressListeners[token] = []
+            }
+            progressListeners[token].push(callback);
+            console.log('received listener for:', token, callback);
+        }
+    """))

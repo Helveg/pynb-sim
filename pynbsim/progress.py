@@ -1,4 +1,5 @@
 import types, os
+from ._state import module_state
 
 class ProgressReader:
     def listen(self):
@@ -52,3 +53,6 @@ class ProgressFileReader(ProgressReader):
                         start = n + 1
                 if process.poll() is not None:
                     break
+
+def add_progress_listener(listener):
+    pass

@@ -85,8 +85,6 @@ def init_page():
 
         });
         $(`<style>
-            #Network-simulation { color: red !important;}
-
             .powered-by-header {
                 width: 100%;
                 margin-bottom: 4px;

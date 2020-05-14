@@ -11,7 +11,7 @@ class ProgressFileReader(ProgressReader):
         self.messages = []
         self.progress = []
 
-    def listen(self, process):
+    def listen(self, process=None):
         import base64
         from time import sleep
         preamble = chr(240) + chr(80) + chr(85) + chr(248) + chr(228)
@@ -51,7 +51,7 @@ class ProgressFileReader(ProgressReader):
                                 yield progress
                         in_message = not in_message
                         start = n + 1
-                if process.poll() is not None:
+                if process and process.poll() is not None:
                     break
 
 def add_progress_listener(listener):

@@ -27,7 +27,7 @@ setuptools.setup(
          "Operating System :: OS Independent",
      ],
      install_requires=[
-
+        "ipython"
      ],
      extras_require={
       "dev": ["sphinx", "sphinx_rtd_theme"]

@@ -11,7 +11,7 @@ class ProgressFileReader(ProgressReader):
         self.messages = []
         self.progress = []
 
-    def listen(self, process=None):
+    def listen_messages(self, process=None):
         import base64
         from time import sleep
         preamble = chr(240) + chr(80) + chr(85) + chr(248) + chr(228)
@@ -38,21 +38,24 @@ class ProgressFileReader(ProgressReader):
                                 lambda s: base64.b64decode(bytes(s, 'UTF-8')).decode('UTF-8'),
                                 payload.split(bar)
                             ))
-                            if header == '':
-                                self.messages.append(message)
-                            elif header == 'simulation_progress':
-                                data = message.split("+")
-                                progress = types.SimpleNamespace(
-                                    progression = float(data[0]),
-                                    duration = float(data[1]),
-                                    time = float(data[2]),
-                                )
-                                self.progress.append(progress)
-                                yield progress
+                            self.messages.append((header, message))
+                            yield header, message
                         in_message = not in_message
                         start = n + 1
                 if process and process.poll() is not None:
                     break
+
+    def listen(self, process=None):
+        for header, message in self.messages(process):
+            if header == 'simulation_progress':
+                data = message.split("+")
+                progress = types.SimpleNamespace(
+                    progression = float(data[0]),
+                    duration = float(data[1]),
+                    time = float(data[2]),
+                )
+                self.progress.append(progress)
+                yield progress
 
 def add_progress_listener(listener):
     pass

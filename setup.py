@@ -3,7 +3,7 @@ import setuptools, os, sys
 with open(os.path.join(os.path.dirname(__file__), "pynbsim", "__init__.py"), "r") as f:
     for line in f:
         if "__version__ = " in line:
-            exec(line)
+            exec(line.strip())
             break
 
 with open("README.md", "r") as fh:
